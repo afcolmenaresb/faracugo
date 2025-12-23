@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🎄 Un regalo de Navidad</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    :root { color-scheme: light; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #0b0f14;
+      color: #eef2f6;
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .card {
+      width: min(720px, 100%);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    h1 { margin: 0 0 12px; font-size: 22px; font-weight: 650; letter-spacing: 0.2px; }
+    p { margin: 10px 0; line-height: 1.55; font-size: 16px; color: rgba(238,242,246,0.92); }
+    .muted { color: rgba(238,242,246,0.70); font-size: 14px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+    .pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 14px;
+    }
+    .btn {
+      margin-top: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.16);
+      color: #eef2f6;
+      text-decoration: none;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+    }
+    .btn:active { transform: translateY(1px); }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <h1 id="title">🎄 Un regalo de Navidad</h1>
+
+    <!-- Vista BLOQUEADA -->
+    <div id="lockedView">
+      <p>Este mensaje no está bloqueado.</p>
+      <p><strong>Está esperando el momento correcto.</strong></p>
+
+      <div class="row">
+        <span class="pill">📅 <span class="mono">24/12/2025</span></span>
+        <span class="pill">🕛 <span class="mono">12:00</span> (hora local)</span>
+      </div>
+
+      <p class="muted" id="nowText" style="margin-top:16px;"></p>
+      <p class="muted">Si llegaste aquí antes de tiempo, vuelve a escanear a las 12:00.</p>
+
+      <button class="btn" id="retryBtn" type="button">Revisar otra vez</button>
+    </div>
+
+    <!-- Vista DESBLOQUEADA (redirige) -->
+    <div id="unlockedView" class="hidden">
+      <p><strong>Feliz Navidad.</strong></p>
+      <p class="muted">Abriendo tu regalo…</p>
+      <a class="btn" id="openBtn" href="#" rel="noopener">Abrir ahora</a>
+    </div>
+  </main>
+
+  <script>
+    // ✅ Pega aquí tu link público de Notion
+    const NOTION_URL = "NOTION_URL_AQUI";
+
+    // Desbloqueo: 24 dic 2025, 12:00 (MEDIODÍA) en HORA LOCAL del dispositivo
+    const unlockAtLocal = new Date(2025, 11, 24, 12, 0, 0, 0); // Mes 11 = diciembre
+
+    const lockedView = document.getElementById("lockedView");
+    const unlockedView = document.getElementById("unlockedView");
+    const nowText = document.getElementById("nowText");
+    const openBtn = document.getElementById("openBtn");
+    const retryBtn = document.getElementById("retryBtn");
+
+    function fmt(d) {
+      try {
+        return new Intl.DateTimeFormat(undefined, {
+          year: "numeric", month: "2-digit", day: "2-digit",
+          hour: "2-digit", minute: "2-digit", second: "2-digit"
+        }).format(d);
+      } catch {
+        return d.toString();
+      }
+    }
+
+    function check() {
+      if (!NOTION_URL || NOTION_URL.includes("https://www.notion.so/041d9a3f21b048e49312c8866b755bb2")) {
+        nowText.textContent = "⚠️ Falta configurar el link de Notion (NOTION_URL).";
+        return;
+      }
+
+      const now = new Date();
+      nowText.textContent = `Hora actual del dispositivo: ${fmt(now)}`;
+
+      if (now >= unlockAtLocal) {
+        lockedView.classList.add("hidden");
+        unlockedView.classList.remove("hidden");
+        openBtn.href = NOTION_URL;
+
+        // Redirección automática (con fallback al botón)
+        setTimeout(() => {
+          window.location.replace(NOTION_URL);
+        }, 900);
+      } else {
+        lockedView.classList.remove("hidden");
+        unlockedView.classList.add("hidden");
+      }
+    }
+
+    retryBtn.addEventListener("click", check);
+    check();
+  </script>
+</body>
+</html>
