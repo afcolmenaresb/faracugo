@@ -112,9 +112,9 @@
     }
 
     function check() {
-      if (!NOTION_URL || NOTION_URL.includes("https://www.notion.so/041d9a3f21b048e49312c8866b755bb2")) {
-        nowText.textContent = "⚠️ Falta configurar el link de Notion (NOTION_URL).";
-        return;
+      if (!NOTION_URL || NOTION_URL.includes("NOTION_URL_AQUI")) {
+  nowText.textContent = "⚠️ Falta configurar el link de Notion (NOTION_URL).";
+  return;
       }
 
       const now = new Date();
