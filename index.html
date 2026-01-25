@@ -110,7 +110,7 @@
   return;
       }
 
-      const now = new Date();
+      now = new Date();
       nowText.textContent = `Hora actual del dispositivo: ${fmt(now)}`;
 
       if (now >= unlockAtLocal) {
