@@ -108,7 +108,7 @@
     // Link público de Notion (regalo final)
     const NOTION_URL = "https://www.notion.so/Poco-a-poco-se-ir-descubriendo-este-regalo-para-ti-amor-de-mi-vida-2d3c5e5e071780a483e2f0eaebd0e7b0";
 
-    // Endpoint de Sheet.best (ya me lo diste)
+    // Endpoint de Sheet.best
     const SHEET_ENDPOINT = "https://api.sheetbest.com/sheets/5ededac8-331b-478d-a1ff-bd766dd762ad";
 
     // IMPORTANTÍSIMO: Meses en JS → enero=0 ... diciembre=11
@@ -265,7 +265,7 @@ de que no recuerdas
           msg = `Ya completaste todas las pistas. El regalo final se abrirá en su momento.`;
         }
       } else if(nextLock){
-        msg = `La próxima pista se desbloquea el ${fmt(nextLock)} (hora local).`;
+        msg = `La próxima pista se desbloquea en cualquier día...`;
       } else {
         msg = `Vuelve más tarde.`;
       }
@@ -343,7 +343,7 @@ de que no recuerdas
             } else {
               showFrame();
             }
-          }, 2000);
+          }, 5000);
         };
 
         optionsEl.appendChild(btn);
