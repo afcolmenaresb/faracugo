@@ -61,8 +61,8 @@
       </p>
 
       <div class="row">
-        <span class="pill">🧩 Pistas: <span class="mono" id="progressPill">0/3</span></span>
-        <span class="pill">🕰️ Hoy: <span class="mono" id="nowPill"></span></span>
+        <span class="pill">Pistas: <span class="mono" id="progressPill">0/3</span></span>
+        <span class="pill">Hoy: <span class="mono" id="nowPill"></span></span>
       </div>
 
       <div class="divider"></div>
@@ -75,7 +75,7 @@
       </div>
 
       <p class="muted" style="margin-top:12px;">
-        Si hoy no te apetece, no pasa nada. Vuelve cuando quieras.
+        Algunas elecciones se guardan para preparar tu sorpresa.
       </p>
     </div>
 
@@ -105,16 +105,20 @@
   </main>
 
   <script>
-    // ======= CONFIGURA AQUÍ =======
+    // =========================
+    // ✅ CONFIGURACIÓN
+    // =========================
 
-    // 1) Link público de Notion (tu regalo final / carta / plan general cuando toque)
-    const NOTION_URL = "https://funny-measure-e02.notion.site/Poco-a-poco-se-ir-descubriendo-este-regalo-para-ti-amor-de-mi-vida-2d3c5e5e071780a483e2f0eaebd0e7b0";
+    // Link público de Notion (regalo final)
+    const NOTION_URL = "https://www.notion.so/Poco-a-poco-se-ir-descubriendo-este-regalo-para-ti-amor-de-mi-vida-2d3c5e5e071780a483e2f0eaebd0e7b0";
 
-    // 2) Fechas de liberación de cada pista (hora local del dispositivo)
-    //    Mes: enero=0 ... diciembre=11
+    // Endpoint de Sheet.best (ya me lo diste)
+    const SHEET_ENDPOINT = "https://api.sheetbest.com/sheets/5ededac8-331b-478d-a1ff-bd766dd762ad";
+
+    // IMPORTANTÍSIMO: Meses en JS → enero=0 ... diciembre=11
     const steps = [
       {
-        unlockAt: new Date(2026, 0, 27, 12, 0, 0, 0), // EJEMPLO: 27 ene 2026 12:00
+        unlockAt: new Date(2026, 0, 27, 12, 0, 0, 0), // 27 ene 2026 12:00
         title: "Nuestro primer abrazo",
         q:
 `Antes de cualquier viaje, hubo un punto de partida.
@@ -123,15 +127,15 @@ Fue un gesto que lo cambió todo.
 
 ¿Te acuerdas cuál fue?`,
         options: [
-          "🤍 Ese abrazo que llegó antes de lo previsto",
-          "✨ Ese momento en el que todo se calmó",
-          "🫂 Ese instante en que el mundo se volvió pequeño"
+          "Ese abrazo que llegó antes de lo previsto",
+          "Ese momento en el que todo se calmó",
+          "Una pregunta random de transporte en el momento perfecto"
         ],
         after:
 "Bien. Ya lo sabes: esto va con calma. Sin ansiedad. Solo detalles bonitos."
       },
       {
-        unlockAt: new Date(2026, 1, 10, 12, 0, 0, 0), // EJEMPLO: 10 feb 2026 12:00
+        unlockAt: new Date(2026, 1, 10, 12, 0, 0, 0), // 10 feb 2026 12:00
         title: "La confusión de la “sagrada familia”",
         q:
 `A veces usamos palabras iguales para cosas distintas…
@@ -141,15 +145,15 @@ Ese día supe que hablábamos el mismo idioma.
 
 ¿Qué fue lo más importante?`,
         options: [
-          "🧠 Entendernos, aunque pensáramos distinto",
-          "🤍 Reírnos del enredo",
-          "🔍 Descubrir que hablábamos de lo mismo"
+          "Entendernos, aunque pensáramos distinto",
+          "Reírnos del enredo",
+          "Descubrir que caminaríamos el mismo sendero"
         ],
         after:
-"Perfecto. Esta es la clase de pista que solo nosotros entendemos."
+"Perfecto, amor de mi vida. Esta es la clase de pista que solo nosotros entendemos."
       },
       {
-        unlockAt: new Date(2026, 1, 24, 12, 0, 0, 0), // EJEMPLO: 24 feb 2026 12:00
+        unlockAt: new Date(2026, 1, 24, 12, 0, 0, 0), // 24 feb 2026 12:00
         title: "Nuestra primera misa juntos",
         q:
 `No todo lo importante se planea.
@@ -160,23 +164,24 @@ y aun así, fue distinto.
 
 ¿Qué crees que lo hizo especial?`,
         options: [
-          "🙏 Estar en el mismo lugar, con la misma intención",
-          "🕯️ El silencio compartido",
-          "✨ Sentir que algo empezaba"
+          "Estar en el mismo lugar, con la misma intención",
+          "El silencio compartido",
+          "Nuestras manos entrelazadas en aquel lugar sagrado"
         ],
         after:
-"Me lo apunto. Y sí: el marco es Colombia. Los detalles… se irán revelando."
+"No te imaginas cuánto te amo"
       }
     ];
 
-    // 3) Fecha a partir de la cual se habilita el botón final (Notion).
-    //    Si quieres que Notion se abra solo al final del juego, déjalo muy adelante.
-    //    Si quieres que Notion se abra al terminar la pista 3, pon una fecha cercana a ese día.
-    const finalUnlockAt = new Date(2026, 1, 24, 12, 5, 0, 0);
+    // Cuándo habilitas el botón final (Notion)
+    // Si quieres que sea inmediatamente al completar la última pista, déjalo cercano.
+    const finalUnlockAt = new Date(2026, 4, 24, 12, 5, 0, 0);
 
-    // ======= NO TOCAR (lógica) =======
+    // =========================
+    // 🔒 LÓGICA (NO TOCAR)
+    // =========================
 
-    const storageKey = "gift_progress_v1";
+    const storageKey = "gift_progress_v2";
     const frameView = document.getElementById("frameView");
     const gameView = document.getElementById("gameView");
     const finalView = document.getElementById("finalView");
@@ -237,7 +242,6 @@ y aun así, fue distinto.
     }
 
     function nextLockedStepDate(now){
-      // próxima pista aún no desbloqueada
       for(const s of steps){
         if(now < s.unlockAt) return s.unlockAt;
       }
@@ -259,7 +263,7 @@ y aun así, fue distinto.
         msg = `✅ Hay una pista disponible ahora.`;
       } else if(answered >= steps.length){
         if(now >= finalUnlockAt){
-          msg = `✅ Todas las pistas están abiertas. Puedes ver el regalo cuando quieras.`;
+          msg = `✅ Todas las pistas están listas. Puedes abrir el regalo cuando quieras.`;
         } else {
           msg = `✅ Ya completaste todas las pistas. El regalo final se abrirá en su momento.`;
         }
@@ -283,16 +287,8 @@ y aun así, fue distinto.
       const p = loadProgress();
       const s = steps[stepIdx];
 
-      // seguridad: si no está desbloqueado, volver
-      if(now < s.unlockAt){
-        showFrame();
-        return;
-      }
-      // si ya está contestado, volver
-      if(p.answered.some(x => x.step === stepIdx)){
-        showFrame();
-        return;
-      }
+      if(now < s.unlockAt){ showFrame(); return; }
+      if(p.answered.some(x => x.step === stepIdx)){ showFrame(); return; }
 
       frameView.classList.add("hidden");
       gameView.classList.remove("hidden");
@@ -310,14 +306,38 @@ y aun así, fue distinto.
         btn.className = "btn";
         btn.type = "button";
         btn.textContent = opt;
-        btn.onclick = () => {
+
+        btn.onclick = async () => {
+          // 1) Guardar local (para continuidad en ese mismo dispositivo)
           const prog = loadProgress();
           prog.answered.push({ step: stepIdx, choice: i, at: new Date().toISOString() });
           saveProgress(prog);
 
+          // 2) Enviar a Google Sheets vía Sheet.best (para que tú puedas verlas)
+          //    IMPORTANTE: tu Sheet debe tener columnas con estos nombres:
+          //    timestamp | step | title | choiceIndex | choiceText | userAgent
+          //    (y opcionalmente pageUrl)
+          try{
+            await fetch(SHEET_ENDPOINT, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                timestamp: new Date().toISOString(),
+                step: stepIdx + 1,
+                title: s.title,
+                choiceIndex: i,
+                choiceText: opt,
+                userAgent: navigator.userAgent,
+                pageUrl: location.href
+              })
+            });
+          }catch(e){
+            // Silencioso: no rompemos la experiencia si falla la red
+          }
+
           afterText.textContent = s.after;
 
-          // Después de elegir, volver al marco (o final si ya toca)
+          // 3) Volver al marco (o final si ya toca)
           setTimeout(() => {
             const now2 = new Date();
             const answered = countAnswered();
@@ -328,6 +348,7 @@ y aun así, fue distinto.
             }
           }, 700);
         };
+
         optionsEl.appendChild(btn);
       });
     }
@@ -336,27 +357,24 @@ y aun así, fue distinto.
       frameView.classList.add("hidden");
       gameView.classList.add("hidden");
       finalView.classList.remove("hidden");
-      openBtn.href = NOTION_URL;
+      openBtn.href = NOTION_URL || "#";
     }
 
     startBtn.addEventListener("click", () => {
       const now = new Date();
       const answered = countAnswered();
 
-      // Si ya completó todo y ya es momento, final
       if(answered >= steps.length && now >= finalUnlockAt){
         showFinal();
         return;
       }
 
-      // Si hay pista disponible, mostrarla
       const idx = nextAvailableStepIndex(now);
       if(idx !== -1){
         showGame(idx);
         return;
       }
 
-      // Si no hay pista disponible, solo actualiza estado
       updateFrame();
     });
 
