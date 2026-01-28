@@ -73,10 +73,7 @@
         <button class="btn secondary" id="resetBtn" type="button">Reiniciar</button>
       </div>
 
-      <p class="muted" style="margin-top:12px;">
-        Algunas elecciones se guardan para preparar tu sorpresa.
-      </p>
-    </div>
+         </div>
 
     <!-- Vista juego -->
     <div id="gameView" class="hidden">
@@ -260,17 +257,17 @@ de que no recuerdas
 
       let msg = "";
       if(idx !== -1){
-        msg = `✅ Hay una pista disponible ahora.`;
+        msg = `Hay una pista disponible ahora.`;
       } else if(answered >= steps.length){
         if(now >= finalUnlockAt){
-          msg = `✅ Todas las pistas están listas. Puedes abrir el regalo cuando quieras.`;
+          msg = `Todas las pistas están listas. Puedes abrir el regalo cuando quieras.`;
         } else {
-          msg = `✅ Ya completaste todas las pistas. El regalo final se abrirá en su momento.`;
+          msg = `Ya completaste todas las pistas. El regalo final se abrirá en su momento.`;
         }
       } else if(nextLock){
-        msg = `⏳ La próxima pista se desbloquea el ${fmt(nextLock)} (hora local).`;
+        msg = `La próxima pista se desbloquea el ${fmt(nextLock)} (hora local).`;
       } else {
-        msg = `⏳ Vuelve más tarde.`;
+        msg = `Vuelve más tarde.`;
       }
       statusBox.textContent = msg;
     }
@@ -346,7 +343,7 @@ de que no recuerdas
             } else {
               showFrame();
             }
-          }, 700);
+          }, 2000);
         };
 
         optionsEl.appendChild(btn);
