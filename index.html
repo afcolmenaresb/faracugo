@@ -9,7 +9,7 @@
     body{
       margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       background:#0b0f14; color:#eef2f6;
-      display:grid; place-items:center; min-height:100vh; padding:24px;
+      display:grid; place-items:center; min-height:100vh; padding:24px; text-align: center;
     }
     .card{
       width:min(720px,100%);
@@ -17,7 +17,9 @@
       border:1px solid rgba(255,255,255,0.12);
       border-radius:20px; padding:28px;
       box-shadow:0 10px 30px rgba(0,0,0,0.35);
+      text-align: left;
     }
+    .card.centered { text-align: center; }
     h1{ margin:0 0 12px; font-size:22px; font-weight:700; letter-spacing:.2px;}
     p{ margin:10px 0; line-height:1.55; font-size:16px; color:rgba(238,242,246,0.92);}
     .muted{ color:rgba(238,242,246,0.70); font-size:14px;}
@@ -44,15 +46,29 @@
     .hidden{ display:none; }
     .options{ display:grid; gap:10px; margin-top:10px; }
     .divider{ height:1px; background:rgba(255,255,255,0.12); margin:16px 0; }
-    .ok{ color:#b6ffbf; }
+    .ok{ color:#b6ffbf; font-size: 1.2rem; }
+    
+    /* Estilo para el contenedor del QR */
+    .qr-container {
+      background: white;
+      padding: 15px;
+      border-radius: 15px;
+      display: inline-block;
+      margin: 20px auto;
+    }
+    .qr-container img {
+      display: block;
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+    }
   </style>
 </head>
 
 <body>
-  <main class="card" role="main">
+  <main class="card" id="mainCard" role="main">
     <h1 id="title">Aquí se está cocinando el regalo de cumpleaños número 32 de la mujer más hermosa del mundo</h1>
 
-    <!-- Vista marco seguro (siempre) -->
     <div id="frameView">
       <p><strong>Esto no es un “secreto grande”.</strong></p>
       <p class="muted">
@@ -72,10 +88,8 @@
         <button class="btn" id="startBtn" type="button">Empezar / Continuar</button>
         <button class="btn secondary" id="resetBtn" type="button">Reiniciar</button>
       </div>
+    </div>
 
-         </div>
-
-    <!-- Vista juego -->
     <div id="gameView" class="hidden">
       <p class="muted">Pista <span class="mono" id="stepIndex"></span> de <span class="mono" id="stepTotal"></span></p>
       <p id="question"></p>
@@ -89,12 +103,19 @@
       </div>
     </div>
 
-    <!-- Vista final -->
-    <div id="finalView" class="hidden">
-      <p class="ok"><strong>Listo.</strong></p>
-      <p>Esto es una parte del regalo. Lo demás lo iremos abriendo con tiempo.</p>
-      <a class="btn" id="openBtn" href="#" rel="noopener">Abrir</a>
-      <div class="row">
+    <div id="finalView" class="hidden" style="text-align: center;">
+      <p class="ok"><strong>¡Has completado el inicio!</strong></p>
+      <p>Tus respuestas han abierto la puerta a la verdadera aventura.</p>
+      <p>Escanea este código o toca el botón para entrar a tu misión:</p>
+      
+      <div class="qr-container">
+        <img id="qrImage" src="" alt="QR Misión">
+      </div>
+      
+      <br>
+      <a class="btn" id="openBtn" href="#" target="_blank">ENTRAR A LA MISIÓN ❤️</a>
+      
+      <div class="row" style="justify-content: center;">
         <button class="btn secondary" id="backBtn2" type="button">Volver</button>
       </div>
     </div>
@@ -105,89 +126,60 @@
     // ✅ CONFIGURACIÓN
     // =========================
 
-    // Link público de Notion (regalo final)
-    const NOTION_URL = "https://www.notion.so/Poco-a-poco-se-ir-descubriendo-este-regalo-para-ti-amor-de-mi-vida-2d3c5e5e071780a483e2f0eaebd0e7b0";
+    // PEGA AQUÍ EL LINK DE LA PÁGINA ANTERIOR (NETLIFY/GITHUB/FIREBASE)
+    const LINK_MISION_ANTERIOR = "https://afcolmenaresb.github.io/Faracugo2/"; 
 
-    // Endpoint de Sheet.best
+    // Endpoint de Sheet.best (déjalo igual si te funciona bien)
     const SHEET_ENDPOINT = "https://api.sheetbest.com/sheets/5ededac8-331b-478d-a1ff-bd766dd762ad";
 
-    // IMPORTANTÍSIMO: Meses en JS → enero=0 ... diciembre=11
     const steps = [
       {
-        unlockAt: new Date(2026, 0, 27, 12, 0, 0, 0), // 27 ene 2026 12:00
+        unlockAt: new Date(2025, 0, 1), // Desbloqueado
         title: "Adivina adivinador",
-        q:
-`Cierra los ojos por un momento y piensa en tu cumpleaños, junto a mí.
-
-¿Qué es lo primero que se te viene a la cabeza?`,
-        options: [
-          "Un abrazo",
-          "Playa",
-          "Montaña"
-        ],
-        after:
-"Piénsalo bien, puedes responder hasta 10 veces."
+        q: `Cierra los ojos por un momento y piensa en tu cumpleaños, junto a mí. ¿Qué es lo primero que se te viene a la cabeza?`,
+        options: ["Un abrazo", "Playa", "Montaña"],
+        after: "Piénsalo bien, puedes responder hasta 10 veces."
       },
       {
-        unlockAt: new Date(2026, 0, 29, 12, 0, 0, 0), // 10 feb 2026 12:00
+        unlockAt: new Date(2025, 0, 1), // Desbloqueado
         title: "La confusión de la “sagrada familia”",
-        q:
-`A veces usamos palabras iguales para cosas distintas…
-y aun así, nos entendimos.
-
-Ese día supe que hablábamos el mismo idioma, y sí, hablo de La Sagrada Familia.
-
-¿Qué fue lo más importante para ti?`,
-        options: [
-          "Entendernos, aunque pensáramos distinto",
-          "Reírnos del enredo",
-          "Descubrir que caminaríamos el mismo sendero"
-        ],
-        after:
-"Perfecto, amor de mi vida. Esta es la clase de pista que solo nosotros entendemos."
+        q: `A veces usamos palabras iguales para cosas distintas… y aun así, nos entendimos. Ese día supe que hablábamos el mismo idioma, y sí, hablo de La Sagrada Familia. ¿Qué fue lo más importante para ti?`,
+        options: ["Entendernos, aunque pensáramos distinto", "Reírnos del enredo", "Descubrir que caminaríamos el mismo sendero"],
+        after: "Perfecto, amor de mi vida. Esta es la clase de pista que solo nosotros entendemos."
       },
       {
-        unlockAt: new Date(2026, 1, 24, 12, 0, 0, 0), // 24 feb 2026 12:00
+        // CAMBIO IMPORTANTE: Fecha pasada (2025) para que se desbloquee YA MISMO
+        unlockAt: new Date(2025, 1, 1, 12, 0, 0, 0), 
         title: "Nuestra primera misa juntos",
-        q:
-`La anterior solo era para hacerte sonreír.
-
-No todo lo importante se planea.
-Algunas cosas simplemente se comparten.
-
-Entre el calor en la arena y la brisa del mar, el frío de mi ciudad natal,
-y un lugar al que iremos del que llegaste a escuchar pero estoy seguro
-de que no recuerdas
-
-¿En cuál crees que llegarás a los 32 años de edad?`,
+        q: `La anterior solo era para hacerte sonreír. No todo lo importante se planea. Algunas cosas simplemente se comparten. Entre el calor en la arena y la brisa del mar, el frío de mi ciudad natal, y un lugar al que iremos del que llegaste a escuchar pero estoy seguro de que no recuerdas. ¿En cuál crees que llegarás a los 32 años de edad?`,
         options: [
           "Arena, mar y mi novio persiguiéndome",
           "Frío, lluvia, bohemia y mi novio abrazándome",
           "Mi novio abriéndome la puerta para bajarme en aquél misterioso lugar"
         ],
-        after:
-"No te imaginas cuánto te amo"
+        after: "No te imaginas cuánto te amo. Prepárate, porque esto apenas comienza..."
       }
     ];
 
-    // Cuándo habilitas el botón final (Notion)
-    // Si quieres que sea inmediatamente al completar la última pista, déjalo cercano.
-    const finalUnlockAt = new Date(2026, 4, 24, 12, 5, 0, 0);
+    // Desbloqueo final INMEDIATO tras responder la 3
+    const finalUnlockAt = new Date(2025, 0, 1);
 
     // =========================
-    // 🔒 LÓGICA (NO TOCAR)
+    // 🔒 LÓGICA
     // =========================
 
     const storageKey = "gift_progress_v2";
     const frameView = document.getElementById("frameView");
     const gameView = document.getElementById("gameView");
     const finalView = document.getElementById("finalView");
+    const mainCard = document.getElementById("mainCard");
 
     const startBtn = document.getElementById("startBtn");
     const resetBtn = document.getElementById("resetBtn");
     const backBtn = document.getElementById("backBtn");
     const backBtn2 = document.getElementById("backBtn2");
     const openBtn = document.getElementById("openBtn");
+    const qrImage = document.getElementById("qrImage");
 
     const questionEl = document.getElementById("question");
     const optionsEl = document.getElementById("options");
@@ -215,9 +207,7 @@ de que no recuerdas
         const parsed = JSON.parse(raw);
         if(!parsed.answered) parsed.answered = [];
         return parsed;
-      }catch{
-        return { answered: [] };
-      }
+      }catch{ return { answered: [] }; }
     }
 
     function saveProgress(p){
@@ -248,7 +238,6 @@ de que no recuerdas
     function updateFrame(){
       const now = new Date();
       nowPill.textContent = fmt(now);
-
       const answered = countAnswered();
       progressPill.textContent = `${answered}/${steps.length}`;
 
@@ -257,15 +246,11 @@ de que no recuerdas
 
       let msg = "";
       if(idx !== -1){
-        msg = `Hay una pista disponible ahora.`;
+        msg = `¡Tienes una pista disponible!`;
       } else if(answered >= steps.length){
-        if(now >= finalUnlockAt){
-          msg = `Todas las pistas están listas. Puedes abrir el regalo cuando quieras.`;
-        } else {
-          msg = `Ya completaste todas las pistas. El regalo final se abrirá en su momento.`;
-        }
+        msg = `¡Completado! Toca "Continuar" para ver tu sorpresa.`;
       } else if(nextLock){
-        msg = `La próxima pista se desbloquea en cualquier día...`;
+        msg = `La próxima pista se desbloquea pronto...`;
       } else {
         msg = `Vuelve más tarde.`;
       }
@@ -276,6 +261,7 @@ de que no recuerdas
       frameView.classList.remove("hidden");
       gameView.classList.add("hidden");
       finalView.classList.add("hidden");
+      mainCard.classList.remove("centered");
       updateFrame();
     }
 
@@ -305,15 +291,11 @@ de que no recuerdas
         btn.textContent = opt;
 
         btn.onclick = async () => {
-          // 1) Guardar local (para continuidad en ese mismo dispositivo)
           const prog = loadProgress();
           prog.answered.push({ step: stepIdx, choice: i, at: new Date().toISOString() });
           saveProgress(prog);
 
-          // 2) Enviar a Google Sheets vía Sheet.best (para que tú puedas verlas)
-          //    IMPORTANTE: tu Sheet debe tener columnas con estos nombres:
-          //    timestamp | step | title | choiceIndex | choiceText | userAgent
-          //    (y opcionalmente pageUrl)
+          // Enviar a Sheets
           try{
             await fetch(SHEET_ENDPOINT, {
               method: "POST",
@@ -328,24 +310,22 @@ de que no recuerdas
                 pageUrl: location.href
               })
             });
-          }catch(e){
-            // Silencioso: no rompemos la experiencia si falla la red
-          }
+          }catch(e){}
 
           afterText.textContent = s.after;
 
-          // 3) Volver al marco (o final si ya toca)
+          // Espera 3.5 segundos y decide
           setTimeout(() => {
             const now2 = new Date();
             const answered = countAnswered();
-            if(answered >= steps.length && now2 >= finalUnlockAt){
+            // Si ya respondió todas, vamos a la pantalla del QR
+            if(answered >= steps.length){
               showFinal();
             } else {
               showFrame();
             }
-          }, 5000);
+          }, 3500);
         };
-
         optionsEl.appendChild(btn);
       });
     }
@@ -354,14 +334,21 @@ de que no recuerdas
       frameView.classList.add("hidden");
       gameView.classList.add("hidden");
       finalView.classList.remove("hidden");
-      openBtn.href = NOTION_URL || "#";
+      mainCard.classList.add("centered");
+
+      // Configurar Botón y QR
+      openBtn.href = LINK_MISION_ANTERIOR;
+      
+      // API Gratuita para generar QR al vuelo
+      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(LINK_MISION_ANTERIOR)}`;
+      qrImage.src = qrApiUrl;
     }
 
     startBtn.addEventListener("click", () => {
       const now = new Date();
       const answered = countAnswered();
 
-      if(answered >= steps.length && now >= finalUnlockAt){
+      if(answered >= steps.length){
         showFinal();
         return;
       }
@@ -371,19 +358,19 @@ de que no recuerdas
         showGame(idx);
         return;
       }
-
       updateFrame();
     });
 
     resetBtn.addEventListener("click", () => {
-      localStorage.removeItem(storageKey);
-      showFrame();
+      if(confirm("¿Seguro que quieres borrar el progreso?")){
+        localStorage.removeItem(storageKey);
+        showFrame();
+      }
     });
 
     backBtn.addEventListener("click", showFrame);
     backBtn2.addEventListener("click", showFrame);
 
-    // Inicio
     showFrame();
   </script>
 </body>
